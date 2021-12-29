@@ -30,6 +30,7 @@ import { AddressNetwork, NameNetwork } from "./accounts"
 
 import rootReducer from "./redux-slices"
 import {
+  newKeyringAddress,
   loadAccount,
   updateAccountBalance,
   updateENSName,
@@ -448,7 +449,7 @@ export default class Main extends BaseService<never> {
               network: nameNetwork.network,
             }
             await this.chainService.addAccountToTrack(addressNetwork)
-            this.store.dispatch(loadAccount(address))
+            this.store.dispatch(loadAccount(addressNetwork))
             this.store.dispatch(setNewSelectedAccount(addressNetwork))
           } else {
             throw new Error("Name not found")
@@ -541,7 +542,7 @@ export default class Main extends BaseService<never> {
     const existingAccounts = await this.chainService.getAccountsToTrack()
     existingAccounts.forEach((addressNetwork) => {
       // Mark as loading and wire things up.
-      this.store.dispatch(loadAccount(addressNetwork.address))
+      this.store.dispatch(loadAccount(addressNetwork))
 
       // Force a refresh of the account balance to populate the store.
       this.chainService.getLatestBaseAccountBalance(addressNetwork)
@@ -636,7 +637,7 @@ export default class Main extends BaseService<never> {
 
     this.keyringService.emitter.on("address", (address) => {
       // Mark as loading and wire things up.
-      this.store.dispatch(loadAccount(address))
+      this.store.dispatch(newKeyringAddress(address))
 
       this.chainService.addAccountToTrack({
         address,
